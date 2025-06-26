@@ -3,15 +3,30 @@
 
 #pragma region Contructors
 
-template<int LED_Strips, int Strip_Len>
-LED_Controller<LED_Strips, Strip_Len>::LED_Controller() {
-    FastLED.addLeds<WS2812B, 48>(this->leds[0], Strip_Len);
+template<int... Pins>
+LED_Controller<Pins>::LED_Controller() {
+  this->LED_Strips = 1;
+  this->Strip_Lengths = 1;
+
+  this->reset();
 }
 
-template<int LED_Strips, int Strip_Len>
-LED_Controller<LED_Strips, Strip_Len>::LED_Controller(ESPIChipsets chip, int *led_pins) {
+template<int... Pins>
+LED_Controller<Pins>::LED_Controller(int *led_pins) {
+
+}
+
+template<int... Pins>
+void LED_Controller<Pins>::reset() {
+  this->leds = malloc(LED_Strips * sizeof(CRGB *));
+  this->existingState = malloc(LED_Strips * sizeof(CRGB *));
+  for (int i=0; i<LED_Strips; i++) {
+    this->leds[i] = malloc(Strip_Lengths * sizeof(CRGB));
+    this->existingState[i] = malloc(Strip_Lengths * sizeof(CRGB));
+  }
+
   for(int i = 0; i < LED_Strips; i++) {
-    FastLED.addLeds<chip, 8>(this->leds[i], Strip_Len);
+    FastLED.addLeds<WS2812B, value[i]>(this->leds[i], Strip_Len);
 
     for (int j=0; j<Strip_Len; j++) {
       this->leds[i][j]=CRGB::Black;
@@ -28,8 +43,8 @@ LED_Controller<LED_Strips, Strip_Len>::LED_Controller(ESPIChipsets chip, int *le
 
 #pragma region Public
 
-template<int LED_Strips, int Strip_Len>
-void LED_Controller<LED_Strips, Strip_Len>::Turn_On(bool hard) {
+template<int... Pins>
+void LED_Controller<Pins>::Turn_On(bool hard) {
   
   for(int i = 0; i < LED_Strips; i++) {
     for (int j=0; j<Strip_Len; j++) {
@@ -45,8 +60,8 @@ void LED_Controller<LED_Strips, Strip_Len>::Turn_On(bool hard) {
   this->pushChanges();
 }
 
-template<int LED_Strips, int Strip_Len>
-void LED_Controller<LED_Strips, Strip_Len>::Turn_Off(bool hard) {
+template<int... Pins>
+void LED_Controller<Pins>::Turn_Off(bool hard) {
   
   for(int i = 0; i < LED_Strips; i++) {
     for (int j=0; j<Strip_Len; j++) {
@@ -62,32 +77,33 @@ void LED_Controller<LED_Strips, Strip_Len>::Turn_Off(bool hard) {
   this->pushChanges();
 }
 
-
-template<int LED_Strips, int Strip_Len>
-void LED_Controller<LED_Strips, Strip_Len>::SetColour(CRGB colour) {
+template<int... Pins>
+void LED_Controller<Pins>::SetColour(CRGB colour) {
   for(int i=0; i<LED_Strips; i++) {
     for(int j=0; j<Strip_Len; j++) {
-      this->leds[i] = colour;
+      this->leds[i][j] = colour;
     }
   }
   this->pushChanges();
 }
-template<int LED_Strips, int Strip_Len>
-void LED_Controller<LED_Strips, Strip_Len>::SetColour(CRGB *colours, int len) {
+template<int... Pins>
+void LED_Controller<Pins>::SetColour(CRGB *colours, int len) {
 }
 
-template<int LED_Strips, int Strip_Len>
-void LED_Controller<LED_Strips, Strip_Len>::SetBrightness(int brightness) {
+template<int... Pins>
+void LED_Controller<Pins>::SetBrightness(int brightness) {
+  if(brightness == 0) brightness = 1;
+  
   for(int i=0; i<LED_Strips; i++) {
     for(int j=0; j<Strip_Len; j++) {
-      this->leds[i][j].maximizeBrightness();
-      this->leds[i] %= brightness;
+      this->leds[i][j] = this->existingState[i][j];
+      this->leds[i][j] %= brightness;
     }
   }
   this->pushChanges();
 }
-template<int LED_Strips, int Strip_Len>
-void LED_Controller<LED_Strips, Strip_Len>::SetBrightness(int *brighnesses, int len) {
+template<int... Pins>
+void LED_Controller<Pins>::SetBrightness(int *brighnesses, int len) {
 }
 
 
@@ -96,21 +112,21 @@ void LED_Controller<LED_Strips, Strip_Len>::SetBrightness(int *brighnesses, int 
 
 #pragma region Private
 
-template<int LED_Strips, int Strip_Len>
-void LED_Controller<LED_Strips, Strip_Len>::pushChanges() {
+template<int... Pins>
+void LED_Controller<Pins>::pushChanges() {
   this->solvePowerRequirements();
 
   FastLED.show();
 }
 
 
-template<int LED_Strips, int Strip_Len>
-void LED_Controller<LED_Strips, Strip_Len>::solvePowerRequirements() {
+template<int... Pins>
+void LED_Controller<Pins>::solvePowerRequirements() {
   FastLED.setBrightness(254);
 }
 
-template<int LED_Strips, int Strip_Len>
-void LED_Controller<LED_Strips, Strip_Len>::animate() {
+template<int... Pins>
+void LED_Controller<Pins>::animate() {
 }
 
 #pragma endregion

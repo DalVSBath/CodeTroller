@@ -1,5 +1,5 @@
 #include "A_LED_controller.h"
-#include <FastLED.h>
+//#include <FastLED.h>
 
 // How many leds in your strip?
 #define NUM_LEDS 1
@@ -15,17 +15,29 @@
 #define TIME_FACTOR_SAT 100
 #define TIME_FACTOR_VAL 100
 
-LED_Controller<1,1> *controller;
+LED_Controller<1,1> *onBoard;
+LED_Controller<5,5> *extraLED;
 
 void setup() {
     Serial.begin(115200);
-    controller = new LED_Controller<1, 1>();
+
+    FastLED.setBrightness(255);
+
+    //FastLED.addLeds<WS2812B, DATA_PIN>(leds, 1)
+    onBoard = new LED_Controller<1, 1>();
+    extraLED = new LED_Controller<5, 5>();
+
     delay(2000);  // If something ever goes wrong this delay will allow upload.
+    onBoard->SetColour(CRGB::White);
 }
+
+uint32_t last_ms = 0;
+int bright = 0;
 
 void loop() {
     uint32_t ms = millis();
     
+    /*
     for(int i = 0; i < NUM_LEDS; i++) {
         // Use different noise functions for each LED and each color component
         uint8_t hue = inoise16(ms * TIME_FACTOR_HUE, i * 1000, 0) >> 8;
@@ -38,7 +50,12 @@ void loop() {
         
         controller->SetColour(CRGB(hue, sat, val));
     }
-    //FastLED.setBrightness(ms % 255);  // Set global brightness to 50%
+    */
 
-    //FastLED.show();
+    if(ms - last_ms > 10) {
+        last_ms = ms;
+        bright++;
+        controller->SetBrightness((bright % 255));
+    }
+    
 }

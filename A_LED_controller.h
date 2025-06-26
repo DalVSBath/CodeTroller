@@ -2,21 +2,26 @@
 
 #pragma once
 
-template<int LED_Strips, int Strip_Len>
+template<int... Pins>
 class LED_Controller {
 private:
+  static constexpr std::size_t count = sizeof...(Pins);
+  static constexpr std::array<int, count> value{ Pins... };
+
   void pushChanges();
   void solvePowerRequirements();
   void animate();
+  void reset();
 protected:
-  int pins[LED_Strips];
-  int length;
-  ESPIChipsets chipset;
-  CRGB leds[LED_Strips][Strip_Len];
+  int LED_Strips, Strip_Lengths;
+
+  CRGB **leds;
+  CRGB **existingState;
+
   int brightness;
 public:
   LED_Controller();
-  LED_Controller(ESPIChipsets chip, int *led_pins);
+  LED_Controller(int *led_pins);
 
 
   void Turn_On(bool hard);
