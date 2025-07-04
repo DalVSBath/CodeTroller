@@ -15,8 +15,8 @@
 #define TIME_FACTOR_SAT 100
 #define TIME_FACTOR_VAL 100
 
-LED_Controller<1,1> *onBoard;
-LED_Controller<5,5> *extraLED;
+LED_Controller<10> *onBoard;
+LED_Controller<11> *extraLED;
 
 void setup() {
     Serial.begin(115200);
@@ -24,8 +24,8 @@ void setup() {
     FastLED.setBrightness(255);
 
     //FastLED.addLeds<WS2812B, DATA_PIN>(leds, 1)
-    onBoard = new LED_Controller<1, 1>();
-    extraLED = new LED_Controller<5, 5>();
+    onBoard = new LED_Controller<10>();
+    extraLED = new LED_Controller<11>();
 
     delay(2000);  // If something ever goes wrong this delay will allow upload.
     onBoard->SetColour(CRGB::White);
@@ -55,7 +55,7 @@ void loop() {
     if(ms - last_ms > 10) {
         last_ms = ms;
         bright++;
-        controller->SetBrightness((bright % 255));
+        onBoard->SetBrightness((bright % 255));
     }
     
 }
