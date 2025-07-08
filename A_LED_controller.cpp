@@ -4,7 +4,7 @@
 #pragma region Contructors
 
 template<int... Pins>
-LED_Controller<Pins>::LED_Controller() {
+LED_Controller<Pins...>::LED_Controller() {
   this->LED_Strips = 1;
   this->Strip_Lengths = 1;
 
@@ -12,23 +12,26 @@ LED_Controller<Pins>::LED_Controller() {
 }
 
 template<int... Pins>
-LED_Controller<Pins>::LED_Controller(int *led_pins) {
+LED_Controller<Pins...>::LED_Controller(int *led_pins) {
 
 }
 
 template<int... Pins>
-void LED_Controller<Pins>::reset() {
-  this->leds = malloc(LED_Strips * sizeof(CRGB *));
-  this->existingState = malloc(LED_Strips * sizeof(CRGB *));
+void LED_Controller<Pins...>::reset() {
+  this->leds = (CRGB**)malloc(LED_Strips * sizeof(CRGB *));
+  this->existingState = (CRGB**)malloc(LED_Strips * sizeof(CRGB *));
   for (int i=0; i<LED_Strips; i++) {
-    this->leds[i] = malloc(Strip_Lengths * sizeof(CRGB));
-    this->existingState[i] = malloc(Strip_Lengths * sizeof(CRGB));
+    this->leds[i] = (CRGB*)malloc(Strip_Lengths * sizeof(CRGB));
+    this->existingState[i] = (CRGB*)malloc(Strip_Lengths * sizeof(CRGB));
   }
 
-  for(int i = 0; i < LED_Strips; i++) {
-    FastLED.addLeds<WS2812B, value[i]>(this->leds[i], Strip_Len);
+  uint8_t stripIdx = 0;
 
-    for (int j=0; j<Strip_Len; j++) {
+  ( FastLED.addLeds<WS2812B, Pins>(this->leds[stripIdx++], Strip_Lengths), ... );
+
+  for(int i = 0; i < LED_Strips; i++) {
+
+    for (int j=0; j<Strip_Lengths; j++) {
       this->leds[i][j]=CRGB::Black;
     }
   }
@@ -44,10 +47,10 @@ void LED_Controller<Pins>::reset() {
 #pragma region Public
 
 template<int... Pins>
-void LED_Controller<Pins>::Turn_On(bool hard) {
+void LED_Controller<Pins...>::Turn_On(bool hard) {
   
   for(int i = 0; i < LED_Strips; i++) {
-    for (int j=0; j<Strip_Len; j++) {
+    for (int j=0; j<Strip_Lengths; j++) {
       this->leds[i][j]=CRGB::White;
     }
 
@@ -61,10 +64,10 @@ void LED_Controller<Pins>::Turn_On(bool hard) {
 }
 
 template<int... Pins>
-void LED_Controller<Pins>::Turn_Off(bool hard) {
+void LED_Controller<Pins...>::Turn_Off(bool hard) {
   
   for(int i = 0; i < LED_Strips; i++) {
-    for (int j=0; j<Strip_Len; j++) {
+    for (int j=0; j<Strip_Lengths; j++) {
       this->leds[i][j]=CRGB::Black;
     }
 
@@ -78,24 +81,24 @@ void LED_Controller<Pins>::Turn_Off(bool hard) {
 }
 
 template<int... Pins>
-void LED_Controller<Pins>::SetColour(CRGB colour) {
+void LED_Controller<Pins...>::SetColour(CRGB colour) {
   for(int i=0; i<LED_Strips; i++) {
-    for(int j=0; j<Strip_Len; j++) {
+    for(int j=0; j<Strip_Lengths; j++) {
       this->leds[i][j] = colour;
     }
   }
   this->pushChanges();
 }
 template<int... Pins>
-void LED_Controller<Pins>::SetColour(CRGB *colours, int len) {
+void LED_Controller<Pins...>::SetColour(CRGB *colours, int len) {
 }
 
 template<int... Pins>
-void LED_Controller<Pins>::SetBrightness(int brightness) {
+void LED_Controller<Pins...>::SetBrightness(int brightness) {
   if(brightness == 0) brightness = 1;
   
   for(int i=0; i<LED_Strips; i++) {
-    for(int j=0; j<Strip_Len; j++) {
+    for(int j=0; j<Strip_Lengths; j++) {
       this->leds[i][j] = this->existingState[i][j];
       this->leds[i][j] %= brightness;
     }
@@ -103,7 +106,7 @@ void LED_Controller<Pins>::SetBrightness(int brightness) {
   this->pushChanges();
 }
 template<int... Pins>
-void LED_Controller<Pins>::SetBrightness(int *brighnesses, int len) {
+void LED_Controller<Pins...>::SetBrightness(int *brighnesses, int len) {
 }
 
 
@@ -113,7 +116,7 @@ void LED_Controller<Pins>::SetBrightness(int *brighnesses, int len) {
 #pragma region Private
 
 template<int... Pins>
-void LED_Controller<Pins>::pushChanges() {
+void LED_Controller<Pins...>::pushChanges() {
   this->solvePowerRequirements();
 
   FastLED.show();
@@ -121,12 +124,12 @@ void LED_Controller<Pins>::pushChanges() {
 
 
 template<int... Pins>
-void LED_Controller<Pins>::solvePowerRequirements() {
+void LED_Controller<Pins...>::solvePowerRequirements() {
   FastLED.setBrightness(254);
 }
 
 template<int... Pins>
-void LED_Controller<Pins>::animate() {
+void LED_Controller<Pins...>::animate() {
 }
 
 #pragma endregion

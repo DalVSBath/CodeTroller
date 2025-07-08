@@ -4,10 +4,12 @@
 
 template<int... Pins>
 class LED_Controller {
+    /* ---------- static-time checks ---------- */
+    static_assert(sizeof...(Pins) >= 1 && sizeof...(Pins) <= 5,
+                  "LED_Controller: need between 1 and 5 pins");
+    static_assert(((Pins >= 10 && Pins <= 18) && ...),
+                  "LED_Controller: all pins must be between 10 and 18");
 private:
-  static constexpr std::size_t count = sizeof...(Pins);
-  static constexpr std::array<int, count> value{ Pins... };
-
   void pushChanges();
   void solvePowerRequirements();
   void animate();
@@ -36,8 +38,8 @@ public:
 };
 
 
-template class LED_Controller<1, 1>;
-template class LED_Controller<5, 3>;
-template class LED_Controller<5, 4>;
-template class LED_Controller<5, 5>;
-template class LED_Controller<5, 6>;
+//template class LED_Controller<1, 1>;
+//template class LED_Controller<5, 3>;
+//template class LED_Controller<5, 4>;
+//template class LED_Controller<5, 5>;
+//template class LED_Controller<5, 6>;
