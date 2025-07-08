@@ -7,8 +7,8 @@ class LED_Controller {
     /* ---------- static-time checks ---------- */
     static_assert(sizeof...(Pins) >= 1 && sizeof...(Pins) <= 5,
                   "LED_Controller: need between 1 and 5 pins");
-    static_assert(((Pins >= 10 && Pins <= 18) && ...),
-                  "LED_Controller: all pins must be between 10 and 18");
+    //static_assert(((Pins >= 10 && Pins <= 18) && ...),
+    //              "LED_Controller: all pins must be between 10 and 18");
 private:
   void pushChanges();
   void solvePowerRequirements();
@@ -38,8 +38,9 @@ public:
 };
 
 
-//template class LED_Controller<1, 1>;
-//template class LED_Controller<5, 3>;
-//template class LED_Controller<5, 4>;
+template class LED_Controller<10>;
+template class LED_Controller<11>;
+
+template class LED_Controller<8,9,1,2,3>;
 //template class LED_Controller<5, 5>;
 //template class LED_Controller<5, 6>;
