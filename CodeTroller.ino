@@ -55,7 +55,7 @@ void loop() {
     if(ms - last_ms > 10) {
         last_ms = ms;
         bright++;
-        controller->SetBrightness((bright % 255));
+        onBoard->SetBrightness((bright % 255));
     }
     
 }
